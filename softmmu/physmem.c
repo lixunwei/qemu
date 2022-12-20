@@ -84,9 +84,11 @@ RAMList ram_list = { .blocks = QLIST_HEAD_INITIALIZER(ram_list.blocks) };
 
 static MemoryRegion *system_memory;
 static MemoryRegion *system_io;
+static MemoryRegion *secure_memory;
 
 AddressSpace address_space_io;
 AddressSpace address_space_memory;
+AddressSpace address_space_secure;
 
 static MemoryRegion io_mem_unassigned;
 
@@ -2639,6 +2641,7 @@ static void tcg_commit(MemoryListener *listener)
 static void memory_map_init(void)
 {
     system_memory = g_malloc(sizeof(*system_memory));
+    secure_memory = g_malloc(sizeof(*secure_memory));
 
     memory_region_init(system_memory, NULL, "system", UINT64_MAX);
     address_space_init(&address_space_memory, system_memory, "memory");
@@ -2649,9 +2652,19 @@ static void memory_map_init(void)
     address_space_init(&address_space_io, system_io, "I/O");
 }
 
+void secure_map_init(void)
+{
+    address_space_init(&address_space_secure, secure_memory, "secure-memory");
+}
+
 MemoryRegion *get_system_memory(void)
 {
     return system_memory;
+}
+
+MemoryRegion *get_secure_memory(void)
+{
+    return secure_memory;
 }
 
 MemoryRegion *get_system_io(void)
@@ -2907,7 +2920,11 @@ MemTxResult address_space_rw(AddressSpace *as, hwaddr addr, MemTxAttrs attrs,
 void cpu_physical_memory_rw(hwaddr addr, void *buf,
                             hwaddr len, bool is_write)
 {
+	if (address_space_secure.root == NULL)
     address_space_rw(&address_space_memory, addr, MEMTXATTRS_UNSPECIFIED,
+                     buf, len, is_write);
+	else
+    address_space_rw(&address_space_secure, addr, MEMTXATTRS_UNSPECIFIED,
                      buf, len, is_write);
 }
 

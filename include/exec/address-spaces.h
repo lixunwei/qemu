@@ -27,6 +27,8 @@
  * until a proper bus interface is available.
  */
 MemoryRegion *get_system_memory(void);
+MemoryRegion *get_secure_memory(void);
+void secure_map_init(void);
 
 /* Get the root I/O port region.  This interface should only be used
  * temporarily until a proper bus interface is available.
