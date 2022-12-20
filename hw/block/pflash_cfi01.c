@@ -500,9 +500,9 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr offset,
         case 0xe8: /* Write to buffer */
             DPRINTF("%s: Write to buffer\n", __func__);
             /* FIXME should save @offset, @width for case 1+ */
-            qemu_log_mask(LOG_UNIMP,
-                          "%s: Write to buffer emulation is flawed\n",
-                          __func__);
+            //qemu_log_mask(LOG_UNIMP,
+            //              "%s: Write to buffer emulation is flawed\n",
+            //             __func__);
             pfl->status |= 0x80; /* Ready! */
             break;
         case 0xf0: /* Probe for AMD flash */
